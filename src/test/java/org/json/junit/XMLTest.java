@@ -41,13 +41,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
-import org.json.XMLXsiTypeConverter;
+import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -65,7 +59,55 @@ public class XMLTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    
+
+    /**
+     * @author Tianren Tan
+     * @date 2022-01-25
+     */
+    @Test
+    public void shouldFindInnerObject() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<contact>\n" +
+                "  <nick>Crista </nick>\n" +
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "  </address>\n" +
+                "</contact>";
+
+        try {
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"));
+            assertEquals("{\"street\":\"Ave of Nowhere\"}", jobj.toString());
+        } catch (JSONException e) {
+        }
+    }
+
+    /**
+     * @author Tianren Tan
+     * @date 2022-01-25
+     */
+    @Test
+    public void shouldReplaceXML() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<contact>\n" +
+                "  <nick>Crista </nick>\n" +
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "  </address>\n" +
+                "</contact>";
+
+        try {
+            JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
+            assertEquals("{\"contact\":{\"nick\":\"Crista \",\"address\":{\"zipcode\":\"92614\",\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}", jobj.toString());
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
+    }
+
     /**
      * JSONObject from a null XML string.
      * Expects a NullPointerException
