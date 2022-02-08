@@ -2,7 +2,7 @@
 ## Milestone 2
 You may find the added code on line 749 for XML.java and line 68 for XMLTest.java
 ## Milestone 3
-###Updates
+### Updates
 Added function
 ```java
 toJSONObject(Reader reader, Function<String, String> keyTransformer)
