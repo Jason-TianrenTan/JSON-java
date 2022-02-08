@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.function.Function;
 
 
 /**
@@ -867,6 +868,52 @@ public class XML {
                         objects.peek().put(tag, obj);
                         objects.push(obj);
                     }
+                }
+                sb = new StringBuilder();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    /**
+     * Replaces all keys with keyTransformer operation
+     * @param reader
+     * @param keyTransformer
+     * @return
+     */
+    public static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) {
+        Stack<String> tags = new Stack<String>();
+        Stack<JSONObject> objects = new Stack<JSONObject>();
+        JSONObject jsonObject = new JSONObject();
+        objects.push(jsonObject);
+        try {
+            ignoreInitial(reader);
+            String tag;
+            StringBuilder sb = new StringBuilder();
+            while ((tag = findNextTag(reader, sb)) != null) {
+                if (tag.startsWith("/")) {
+                    tag = "/" + keyTransformer.apply(tag.substring(1));
+                    if (!tags.isEmpty() && tags.peek().equals(tag.substring(1))) {
+                        String tag_name = tags.pop();
+                        if (objects.peek().keySet().size() == 0) {
+                            objects.pop();
+                            objects.peek().put(tag_name, sb.toString());
+                        } else {
+                            objects.pop();
+                        }
+                        JSONObject obj = new JSONObject();
+                        obj.put(tag_name, objects.peek().get(tag_name));
+                    } else
+                        throw new JSONException("Tags do not match");
+                } else {
+                    tag = keyTransformer.apply(tag);
+                    tags.push(tag);
+                    JSONObject obj = new JSONObject();
+                    objects.peek().put(tag, obj);
+                    objects.push(obj);
                 }
                 sb = new StringBuilder();
             }
