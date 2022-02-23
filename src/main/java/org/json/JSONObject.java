@@ -36,18 +36,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -103,6 +95,29 @@ import java.util.regex.Pattern;
  * @version 2016-08-15
  */
 public class JSONObject {
+
+    /**
+     * Build a stream of JSONObjects corresponding to the inner nodes
+     * @return a stream of JSONObject
+     */
+    public Stream<JSONObject> toStream() {
+        Stream.Builder<JSONObject> builder = Stream.builder();
+        Iterator<String> keys = this.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object obj_key = this.get(key);
+            if (obj_key instanceof JSONObject) {
+                JSONObject jsonObject = (JSONObject) obj_key;
+                builder.add(jsonObject);
+                jsonObject.toStream().forEach(obj -> builder.add(obj));
+            } else if (obj_key instanceof JSONArray) {
+                JSONArray jsonArray = (JSONArray) obj_key;
+                jsonArray.toStream().forEach(obj -> builder.add(obj));
+            }
+        }
+        return builder.build();
+    }
+
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls

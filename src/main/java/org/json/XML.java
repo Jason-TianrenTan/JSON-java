@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 
 /**
@@ -923,6 +924,7 @@ public class XML {
         }
         return jsonObject;
     }
+
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
