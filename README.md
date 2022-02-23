@@ -33,3 +33,11 @@ Comparing to first parsing into object then manually replace each tag with a new
 the overall time complexity is the same, but in our case we still reduce the time from
 traversing the whole XML two times to only one time. This may be a significant improvement
 when handling large XML files.
+
+## Milestone 4
+### Updates
+Added function `public Stream<JSONObject> toStream()` to JSONObject.java (line 103) and JSONArray.java (line 93).</br>
+Added unit test `_testPlainXMLObj()` and `_testStreamArray()`, to run the tests please run `public void testStream()` on line 93 of JSONObjectTest.java.
+
+### About
+I decided to set all return values of `toStream()` to `JSONObject`, in respect of the original `JSONObject` format. The core idea is to traverse through the `JSONObject` using DFS, and ignore generic values such as Integers or Strings, and only extract `JSONObjects`. If a `JSONObject` is confronted, we recursively extract nested objects inside that. On the other hand, for `JSONArray` we traverse the array by index and recursively extract the `JSONObject` inside.
