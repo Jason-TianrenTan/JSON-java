@@ -41,3 +41,15 @@ Added unit test `_testPlainXMLObj()` and `_testStreamArray()`, to run the tests 
 
 ### About
 I decided to set all return values of `toStream()` to `JSONObject`, in respect of the original `JSONObject` format. The core idea is to traverse through the `JSONObject` using DFS, and ignore generic values such as Integers or Strings, and only extract `JSONObjects`. If a `JSONObject` is confronted, we recursively extract nested objects inside that. On the other hand, for `JSONArray` we traverse the array by index and recursively extract the `JSONObject` inside.
+
+## Milestone 5
+###Updates
+Added two functions `public static void toJSONObject(Reader reader, Consumer<JSONObject> callback, Consumer<Exception> exceptionHandler)`(line 941) and 
+`public static Future<JSONObject> toJSONObjectFuture(Reader reader)`(line 957) in `XML.java`. Added two corresponding unit tests `shouldHandleAsyncFunctions()`(line 133)
+and `shouldHandleAsyncFunctionsWithFuture()`(line 143) in `XMLTest.java`.
+
+###About
+For this milestone I used the built-in `toJSONObject(Reader reader)` provided by the original author.
+I wrote two async functions on reading a JSON string. The first one takes two lambda functions as inputs
+and performs callback functionalities after the `JSONObject` is parsed, while the second simply returns
+a `Future<JSONObject>`.
