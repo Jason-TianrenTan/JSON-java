@@ -30,16 +30,11 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
 import org.json.*;
@@ -132,6 +127,22 @@ public class XMLTest {
         } catch (JSONException e) {
             System.out.println(e);
         }
+    }
+
+    @Test
+    public void shouldHandleAsyncFunctions() throws InterruptedException {
+        StringWriter writer = new StringWriter();
+        XML.toJSONObject(new StringReader(xmlString), (JSONObject jo) -> {
+            jo.write(writer);
+        }, (Exception e) -> e.printStackTrace());
+        Thread.sleep(100);
+        assertEquals(writer.toString(), "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}");
+    }
+
+    @Test
+    public void shouldHandleAsyncFunctionsWithFuture() throws ExecutionException, InterruptedException {
+        JSONObject jobj = XML.toJSONObjectFuture(new StringReader(xmlString)).get();
+        assertEquals(jobj.toString(), "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}");
     }
 
     /**

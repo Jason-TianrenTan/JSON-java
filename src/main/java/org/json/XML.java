@@ -27,11 +27,16 @@ SOFTWARE.
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -925,6 +930,34 @@ public class XML {
         return jsonObject;
     }
 
+
+    /**
+     * Asynchronous method applied with reader and callback
+     * @param reader input for JSONObject
+     * @param callback perform after reading
+     * @param exceptionHandler triggers when exception thrown
+     * @return
+     */
+    public static void toJSONObject(Reader reader, Consumer<JSONObject> callback, Consumer<Exception> exceptionHandler) {
+        try {
+            new Thread(() -> {
+                JSONObject jsonObject = toJSONObject(reader);
+                callback.accept(jsonObject);
+            }).start();
+        } catch (Exception e) {
+            exceptionHandler.accept(e);
+        }
+    }
+
+    /**
+     * Same approach using Future
+     * @param reader
+     * @return
+     */
+    public static Future<JSONObject> toJSONObjectFuture(Reader reader) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        return executorService.submit(() -> toJSONObject(reader));
+    }
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
