@@ -132,17 +132,20 @@ public class XMLTest {
     @Test
     public void shouldHandleAsyncFunctions() throws InterruptedException {
         StringWriter writer = new StringWriter();
+        JSONObject obj = XML.toJSONObject(new StringReader(xmlString));
         XML.toJSONObject(new StringReader(xmlString), (JSONObject jo) -> {
             jo.write(writer);
+            assertEquals(obj.toString(), writer.toString());
+            assertEquals("Ave of Nowhere", jo.query("/contact/address/street"));
         }, (Exception e) -> e.printStackTrace());
-        Thread.sleep(100);
-        assertEquals(writer.toString(), "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}");
     }
 
     @Test
     public void shouldHandleAsyncFunctionsWithFuture() throws ExecutionException, InterruptedException {
+        JSONObject obj = XML.toJSONObject(new StringReader(xmlString));
         JSONObject jobj = XML.toJSONObjectFuture(new StringReader(xmlString)).get();
         assertEquals(jobj.toString(), "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}");
+        assertEquals("Crista Lopes", obj.query("/contact/name"));
     }
 
     /**
